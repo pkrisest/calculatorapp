@@ -1,209 +1,117 @@
-//main.dart
-
 import 'package:flutter/material.dart';
-import 'package:math_expressions/math_expressions.dart';
+import 'package:provider/provider.dart';
+import 'controllers/calculator_controller.dart';
 
-
-void main()
+void main() 
 {
-  runApp(MaterialApp(
-    home: CalculatorApp(),
-  ));
+  runApp
+  (
+    ChangeNotifierProvider
+    (
+      create: (context) => CalculatorController(),
+      child: MaterialApp(home: CalculatorApp()),
+    ),
+  );
 }
-  
-class CalculatorApp extends StatefulWidget 
+
+class CalculatorApp extends StatelessWidget 
 {
   const CalculatorApp({super.key});
 
-  @override
-  State<CalculatorApp> createState() => _CalculatorAppState();
-}
-
-class _CalculatorAppState extends State<CalculatorApp> 
-
-// muutujad
-{
-  double firstNum = 0.0;
-  double secondNum = 0.0;
-  var input = "";
-  var output = "";
-  var operation = "";
-  var hideInput = false;
-  var outputSize = 3.0;
-
-static const operatorColor = Color.fromARGB(255, 67, 67, 67);
-static const buttonColor = Color.fromARGB(255, 45, 35, 35);
-static const orangeColor = Color(0xffD9802E);
-
+  static const operatorColor = Color.fromARGB(255, 67, 67, 67);
+  static const buttonColor = Color.fromARGB(255, 45, 35, 35);
+  static const orangeColor = Color(0xffD9802E);
 
   @override
   Widget build(BuildContext context) 
-  
   {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-     
-      body: Column(
-        children: [
-        //input output area
-        Expanded(child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                hideInput ? "" : input,
-                style: TextStyle(
-                  fontSize: 50,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                output,
-                style: TextStyle(
-                  fontSize: outputSize,
-                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.7),
-                ),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-            ],
-            ),
-          )),
-        
-        //Nupud
-        
-        Row(
-          children: [
-            button(text: "AC", buttonBgColor: operatorColor, tColor: orangeColor),
-            button(text: "del", buttonBgColor: operatorColor, tColor: orangeColor),
-            button(text: "conv", buttonBgColor: operatorColor, tColor: orangeColor),
-            button(text: "/", buttonBgColor: operatorColor, tColor: orangeColor),
-          ],
-        ),
-        Row(
-          children: [
-            button(text: "7"),
-            button(text: "8"),
-            button(text: "9"),
-            button(text: "x", tColor: orangeColor, buttonBgColor: operatorColor),
-          ],
-        ),
-        Row(
-          children: [
-            button(text: "4"),
-            button(text: "5"),
-            button(text: "6"),
-            button(text: "-", tColor: orangeColor, buttonBgColor: operatorColor),
-          ],
-        ),
-        Row(
-          children: [
-            button(text: "1"),
-            button(text: "2"),
-            button(text: "3"),
-            button(text: "+", tColor: orangeColor, buttonBgColor: operatorColor),
-          ],
-        ),
-        Row(
-          children: [
-            button(text: "%", tColor: orangeColor, buttonBgColor: operatorColor),
-            button(text: "0"),
-            button(text: "."),
-            button(text: "=", buttonBgColor: orangeColor),
-          ],
-        ),
+    final calculator = Provider.of<CalculatorController>(context);
 
-        Row(
-          children: [
-            button(text: "History", buttonBgColor: orangeColor),
-          ],
-        ),
-      ]),
-      
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+       
+        children: [
+          // Input-Output Display
+          Expanded(
+           
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                
+                children:[
+                  
+                  Text(
+                    calculator.hideInput ? "" : calculator.input,
+                    style: const TextStyle(fontSize: 50, color: Colors.black),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  Text(
+                    calculator.output,
+                    style: TextStyle(
+                      fontSize: calculator.outputSize,
+                      color: Colors.black.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
+
+  
+          Column(
+            children:
+            
+            [
+              buildButtonRow(context, ["AC", "del", "conv", "/"], operatorColor, orangeColor),
+              buildButtonRow(context, ["7", "8", "9", "x"]),
+              buildButtonRow(context, ["4", "5", "6", "-"]),
+              buildButtonRow(context, ["1", "2", "3", "+"]),
+              buildButtonRow(context, ["%", "0", ".", "="]),
+              buildButtonRow(context, ["History"], orangeColor),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-
-  Widget button(
+  Widget buildButtonRow(BuildContext context, List<String> texts, [Color buttonBgColor = buttonColor, Color textColor = Colors.white]) 
   {
-    text, tColor = Colors.white, buttonBgColor = buttonColor
-  })
-    
-  {
-    return Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(8),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)
-                    ),
-                    padding: const EdgeInsets.all(22),
-                   backgroundColor: buttonBgColor,
-                  ),
-                  onPressed: () => onButtonClick(text),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: tColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  ),
-              ),
-            );
+    return Row
+    (
+      children: texts.map((text) => buildButton(context, text, buttonBgColor, textColor)).toList(),
+    );
   }
 
-  onButtonClick(value)
+  Widget buildButton(BuildContext context, String text, Color buttonBgColor, Color tColor) 
   {
-    if(value == "AC")
-    {
-      input = "";
-      output = "";
-    }
-    else if (value == "del")
-    {
-      if (input.isNotEmpty)
-      {
-        input = input.substring(0,input.length-1);
-      }
-    }
-    else if (value == "=")
-    {
-      if (input.isNotEmpty)
-      {
-        var userInput = input.replaceAll("x", "*");
-        Parser parser = Parser();
-        Expression expression = parser.parse(userInput);
-        ContextModel contextModel = ContextModel();
-        var finalValue = expression.evaluate(EvaluationType.REAL, contextModel);
-        output = finalValue.toString();
-        if(output.endsWith(".0"))
-        {
-          output = output.substring(0,output.length-2);
-        }
-        input = output;
-        hideInput = true;
-        outputSize = 52;
-        
-      }
-    }
-    else if(!(value == "conv" || value =="History"))
-    {
-      input = input + value;
-      hideInput = false;
-      outputSize = 34;
-    }
-
-    setState(() {});
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        child: ElevatedButton(
+         
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.all(22),
+            backgroundColor: buttonBgColor,
+          ),
+          onPressed: () => Provider.of<CalculatorController>(context, listen: false).onButtonClick(text),
+          
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 18, color: tColor, fontWeight: FontWeight.bold),
+          ),
+          
+        ),
+      ),
+    );
   }
 
 }
