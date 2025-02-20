@@ -1,6 +1,7 @@
 //main.dart
 
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 
 void main()
@@ -81,7 +82,7 @@ static const orangeColor = Color(0xffD9802E);
         Row(
           children: [
             button(text: "AC", buttonBgColor: operatorColor, tColor: orangeColor),
-            button(text: "<", buttonBgColor: operatorColor, tColor: orangeColor),
+            button(text: "del", buttonBgColor: operatorColor, tColor: orangeColor),
             button(text: "conv", buttonBgColor: operatorColor, tColor: orangeColor),
             button(text: "/", buttonBgColor: operatorColor, tColor: orangeColor),
           ],
@@ -163,7 +164,46 @@ static const orangeColor = Color(0xffD9802E);
 
   onButtonClick(value)
   {
-    
+    if(value == "AC")
+    {
+      input = "";
+      output = "";
+    }
+    else if (value == "del")
+    {
+      if (input.isNotEmpty)
+      {
+        input = input.substring(0,input.length-1);
+      }
+    }
+    else if (value == "=")
+    {
+      if (input.isNotEmpty)
+      {
+        var userInput = input.replaceAll("x", "*");
+        Parser parser = Parser();
+        Expression expression = parser.parse(userInput);
+        ContextModel contextModel = ContextModel();
+        var finalValue = expression.evaluate(EvaluationType.REAL, contextModel);
+        output = finalValue.toString();
+        if(output.endsWith(".0"))
+        {
+          output = output.substring(0,output.length-2);
+        }
+        input = output;
+        hideInput = true;
+        outputSize = 52;
+        
+      }
+    }
+    else if(!(value == "conv" || value =="History"))
+    {
+      input = input + value;
+      hideInput = false;
+      outputSize = 34;
+    }
+
+    setState(() {});
   }
 
 }
