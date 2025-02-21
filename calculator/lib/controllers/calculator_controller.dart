@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/calculator_model.dart';
 import '../screens/converter_screen.dart';
+import '../screens/history_screen.dart';
 
 class CalculatorController extends ChangeNotifier 
 {
@@ -11,6 +12,7 @@ class CalculatorController extends ChangeNotifier
   String get output => calculator.output;
   bool get hideInput => calculator.hideInput;
   double get outputSize => calculator.outputSize;
+  List<String> get history => calculator.history;
 
   void onButtonClick(String value, BuildContext context) 
   {
@@ -33,11 +35,25 @@ class CalculatorController extends ChangeNotifier
         MaterialPageRoute(builder: (context) => ConverterScreen()),
       );
     } 
-    else if (value != "History") 
+    else if (value == "History") 
     {
-           calculator.appendInput(value);
+        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HistoryScreen()),
+      );
     }
 
+    else
+    {
+    calculator.appendInput(value);
+    }
+
+    notifyListeners();
+  } 
+
+  void clearHistory() 
+  {
+    calculator.clearHistory();
     notifyListeners();
   }
 }

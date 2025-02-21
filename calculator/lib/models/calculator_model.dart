@@ -1,4 +1,7 @@
 import 'package:math_expressions/math_expressions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
 
 class CalculatorModel 
 {
@@ -6,6 +9,8 @@ class CalculatorModel
   String output = "";
   bool hideInput = false;
   double outputSize = 50;
+  List<String> history = [];
+
 
   void clear() 
   {
@@ -21,7 +26,7 @@ class CalculatorModel
     }
   }
 
-  void evaluateExpression() 
+  void evaluateExpression() async
   {
     if (input.isNotEmpty) 
     {
@@ -42,6 +47,10 @@ class CalculatorModel
         input = output;
         hideInput = true;
         outputSize = 52;
+  
+        DateTime now = DateTime.now();
+        String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+        await saveHistory("$formattedTime      $userInput = $output");
       } 
       
       catch (e) 
@@ -53,11 +62,25 @@ class CalculatorModel
 
   void appendInput(String value) 
   {
-    if (value != "conv" && value != "History") 
-    {
       input += value;
       hideInput = false;
       outputSize = 34;
-    }
+ 
+  }
+
+  Future<void> saveHistory(String calculation) async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    history.insert(0, calculation); 
+    await prefs.setStringList('calcHistory', history);
+    
+  }
+
+  Future<void> clearHistory() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    history.clear();
+    await prefs.remove('calcHistory');
+    
   }
 }
